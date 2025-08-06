@@ -4,6 +4,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import com.app.dashboard.dashboard.model.Usuario;
+import com.app.dashboard.dashboard.model.Rol;
 import com.app.dashboard.dashboard.repository.UsuarioRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -33,12 +34,12 @@ public class SuperAdminInitializer implements CommandLineRunner {
             superadmin.setActivo(true);
             superadmin.setClaveTemporal(false);
             superadmin.setDebeCambiarPassword(false);
-            superadmin.setRol("SUPERADMIN"); 
+            superadmin.setRol(Rol.SUPERADMIN); 
             
             usuarioRepository.save(superadmin);
-            System.out.println("✅ Superadmin creado");
+            System.out.println("Superadmin creado");
         } else {
-            System.out.println("ℹ️ Superadmin ya existe");
+            System.out.println("Superadmin ya existe");
         }
     }
 }
