@@ -43,7 +43,7 @@ public class SecurityConfig {
             .cors(Customizer.withDefaults())  // Habilita CORS usando el CorsConfigurationSource de abajo
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.POST, "/api/auth/registrar").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/registrar").permitAll()
                 .requestMatchers("/ws/**").permitAll()
                 .anyRequest().authenticated()
             )

@@ -25,6 +25,7 @@ public class AuthController {
         LoginResponseDTO response = authService.login(request.getEmail(), request.getPassword());
         return ResponseEntity.ok(response);
     }
+    
 
     @PostMapping("/registrar")
     public ResponseEntity<String> register(@RequestBody RegistroRequestDTO request) {
