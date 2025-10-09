@@ -1,6 +1,7 @@
 package com.app.dashboard.dashboard.service;
 
 import com.app.dashboard.dashboard.dto.LoginResponseDTO;
+import com.app.dashboard.dashboard.dto.UsuarioResponseDTO;
 import com.app.dashboard.dashboard.exception.ComercioNoEncontradoException;
 import com.app.dashboard.dashboard.exception.EmailYaRegistradoException;
 import com.app.dashboard.dashboard.exception.UsuarioNoEncontradoException;
@@ -9,6 +10,8 @@ import com.app.dashboard.dashboard.model.Usuario;
 import com.app.dashboard.dashboard.repository.ComercioRepository;
 import com.app.dashboard.dashboard.repository.UsuarioRepository;
 import com.app.dashboard.dashboard.security.JwtTokenProvider;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,7 +35,8 @@ public class AuthService {
         }
 
         String token = jwtTokenProvider.generateToken(email);
-        return new LoginResponseDTO(token, usuario.isClaveTemporal());
+        boolean comercioActivo = usuario.getComercio() != null && usuario.getComercio().isActivo();
+        return new LoginResponseDTO(token, usuario.isClaveTemporal(), comercioActivo);
     }
 
     public Usuario crearUsuario(String email, String passwordPlano, boolean claveTemporal, Long comercioId) {
@@ -54,33 +58,47 @@ public class AuthService {
         return usuarioRepository.save(usuario);
     }
 
-    public void cambiarClave(String email, String nuevaClave) {
+    @Transactional
+    public LoginResponseDTO cambiarClaveYGenerarToken(String email, String nuevaClave) {
         Usuario usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new UsuarioNoEncontradoException("Usuario no encontrado"));
 
+        // Si ya no es temporal, puedes decidir si permites o no re-cambio
         usuario.setPassword(passwordEncoder.encode(nuevaClave));
-        usuario.setClaveTemporal(false); // Ya no es temporal
+        usuario.setClaveTemporal(false); // o setDebeCambiarPassword(false) según tu modelo
         usuarioRepository.save(usuario);
+
+        String token = jwtTokenProvider.generateToken(usuario.getEmail()); // adapta a tu método
+        boolean comercioActivo = usuario.getComercio() != null && usuario.getComercio().isActivo();
+
+        return new LoginResponseDTO(token, false, comercioActivo);
     }
 
-    public void completarRegistro(String email, String nuevaClave, String correoBancario, String llaveActual) {
+    @Transactional
+    public LoginResponseDTO completarRegistroYGenerarToken(String email, String correoBancario, String llaveActual) {
         Usuario usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new UsuarioNoEncontradoException("Usuario no encontrado"));
-    
-        Comercio comercio = usuario.getComercio();
-    
-        usuario.setPassword(passwordEncoder.encode(nuevaClave));
-        usuario.setClaveTemporal(false);
-        usuario.setDebeCambiarPassword(false);
-        usuario.setActivo(true);
-    
+
+        if (usuario.getComercio() == null) {
+            throw new RuntimeException("Usuario no tiene comercio asociado");
+        }
+
+        Comercio comercio = comercioRepository.findById(usuario.getComercio().getId())
+                .orElseThrow(() -> new ComercioNoEncontradoException("Comercio no encontrado"));
+
         comercio.setEmailBancario(correoBancario);
         comercio.setLlaveActual(llaveActual);
         comercio.setActivo(true);
-    
-        usuarioRepository.save(usuario);
         comercioRepository.save(comercio);
+
+        // (opcional) actualizar usuario si guardas flags en usuario
+        usuario.setComercio(comercio);
+        usuarioRepository.save(usuario);
+
+        String token = jwtTokenProvider.generateToken(usuario.getEmail());
+        boolean claveTemporal = usuario.isClaveTemporal(); // true/false segun tu entidad
+
+        return new LoginResponseDTO(token, claveTemporal, true);
     }
-    
 
 }

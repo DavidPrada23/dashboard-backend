@@ -40,15 +40,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .cors(Customizer.withDefaults())  // Habilita CORS usando el CorsConfigurationSource de abajo
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/registrar").permitAll()
-                .requestMatchers("/ws/**").permitAll()
-                .anyRequest().authenticated()
-            )
-            .addFilterBefore(new JwtFilter(jwtTokenProvider, userDetailsService),
-                 UsernamePasswordAuthenticationFilter.class);
+                .cors(Customizer.withDefaults()) // Habilita CORS usando el CorsConfigurationSource de abajo
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/registrar").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/comercio/activar").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
+                        .anyRequest().authenticated())
+                .addFilterBefore(new JwtFilter(jwtTokenProvider, userDetailsService),
+                        UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -84,9 +84,15 @@ public class SecurityConfig {
 
         @Override
         protected void doFilterInternal(HttpServletRequest request,
-                                        HttpServletResponse response,
-                                        FilterChain filterChain)
+                HttpServletResponse response,
+                FilterChain filterChain)
                 throws ServletException, IOException {
+
+            String path = request.getRequestURI();
+            if (path.startsWith("/api/auth/login") || path.startsWith("/api/auth/registrar")) {
+                filterChain.doFilter(request, response);
+                return;
+            }
 
             String authHeader = request.getHeader("Authorization");
             if (authHeader != null && authHeader.startsWith("Bearer ")) {

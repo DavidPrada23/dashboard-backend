@@ -1,12 +1,13 @@
 package com.app.dashboard.dashboard.dto;
 
-import lombok.Data;
 
-@Data
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class CompletarRegistroDTO {
     
-    private String email;
-    private String nuevaClave;
     private String correoBancario;
     private String llaveActual;
 }

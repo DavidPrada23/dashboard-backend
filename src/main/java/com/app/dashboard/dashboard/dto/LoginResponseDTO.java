@@ -1,11 +1,14 @@
 package com.app.dashboard.dashboard.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Setter
+@Getter
 @AllArgsConstructor
 public class LoginResponseDTO {
     private String token;
     private boolean claveTemporal;
+    private boolean comercioActivo;
 }

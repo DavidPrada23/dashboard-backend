@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-//import com.app.dashboard.dashboard.exception.ComercioNoEncontradoException;
+import com.app.dashboard.dashboard.exception.ComercioNoEncontradoException;
 import com.app.dashboard.dashboard.model.Comercio;
 import com.app.dashboard.dashboard.model.Usuario;
 import com.app.dashboard.dashboard.repository.ComercioRepository;
@@ -64,7 +64,7 @@ public class ComercioService {
      */
     public Comercio obtenerPerfil(String email) {
         return comercioRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("Comercio no encontrado"));
+            .orElseThrow(() -> new ComercioNoEncontradoException("Comercio no encontrado"));
     }
 
     /**
@@ -72,9 +72,11 @@ public class ComercioService {
      */
     public void actualizarLlave(String email, String nuevaLlave) {
         Comercio comercio = comercioRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("Comercio no encontrado"));
+            .orElseThrow(() -> new ComercioNoEncontradoException("Comercio no encontrado"));
 
         comercio.setLlaveActual(nuevaLlave);
         comercioRepository.save(comercio);
     }
+
+
 }
