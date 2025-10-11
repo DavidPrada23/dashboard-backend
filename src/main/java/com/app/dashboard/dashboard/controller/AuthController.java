@@ -5,14 +5,11 @@ import com.app.dashboard.dashboard.dto.CompletarRegistroDTO;
 import com.app.dashboard.dashboard.dto.LoginRequestDTO;
 import com.app.dashboard.dashboard.dto.LoginResponseDTO;
 import com.app.dashboard.dashboard.dto.RegistroRequestDTO;
-import com.app.dashboard.dashboard.dto.UsuarioResponseDTO;
 import com.app.dashboard.dashboard.service.AuthService;
 
 import lombok.RequiredArgsConstructor;
 
-import java.util.Map;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -1,7 +1,6 @@
 package com.app.dashboard.dashboard.service;
 
 import com.app.dashboard.dashboard.dto.LoginResponseDTO;
-import com.app.dashboard.dashboard.dto.UsuarioResponseDTO;
 import com.app.dashboard.dashboard.exception.ComercioNoEncontradoException;
 import com.app.dashboard.dashboard.exception.EmailYaRegistradoException;
 import com.app.dashboard.dashboard.exception.UsuarioNoEncontradoException;

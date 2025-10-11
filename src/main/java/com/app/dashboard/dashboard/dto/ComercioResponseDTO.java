@@ -8,5 +8,8 @@ import lombok.Setter;
 public class ComercioResponseDTO {
     private Long id;
     private String nombre;
+    private boolean activo;
     private String email;
+    private String emailBancario;
+    private String llaveActual;
 }
