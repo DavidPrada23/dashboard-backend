@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,6 +33,13 @@ public class Llave {
     @Column(nullable = false)
     private LocalDateTime fechaGeneracion;
 
+    @PrePersist
+    protected void onCreate() {
+        if (fechaGeneracion == null) {
+            fechaGeneracion = LocalDateTime.now();
+        }
+    }
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comercio_id", nullable = false)
     private Comercio comercio;
