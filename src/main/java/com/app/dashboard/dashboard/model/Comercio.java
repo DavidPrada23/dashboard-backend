@@ -25,7 +25,7 @@ public class Comercio {
     @Column(unique = true)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "email_bancario")
     private String emailBancario;
 
     @Column(name = "llave_actual")

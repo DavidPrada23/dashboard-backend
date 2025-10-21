@@ -74,7 +74,7 @@ public class AuthService {
     }
 
     @Transactional
-    public LoginResponseDTO completarRegistroYGenerarToken(String email, String correoBancario, String llaveActual) {
+    public LoginResponseDTO completarRegistroYGenerarToken(String email, String emailBancario, String llaveActual) {
         Usuario usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new UsuarioNoEncontradoException("Usuario no encontrado"));
 
@@ -85,7 +85,7 @@ public class AuthService {
         Comercio comercio = comercioRepository.findById(usuario.getComercio().getId())
                 .orElseThrow(() -> new ComercioNoEncontradoException("Comercio no encontrado"));
 
-        comercio.setEmailBancario(correoBancario);
+        comercio.setEmailBancario(emailBancario);
         comercio.setLlaveActual(llaveActual);
         comercio.setActivo(true);
         comercioRepository.save(comercio);

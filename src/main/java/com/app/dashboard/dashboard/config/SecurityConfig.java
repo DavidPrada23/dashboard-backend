@@ -43,8 +43,9 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults()) // Habilita CORS usando el CorsConfigurationSource de abajo
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/registrar", "/api/llaves").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/registrar", "/api/llaves", "/api/auth/completar-registro").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/comercio/activar").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/comercio/me","/api/ventas/mis-ventas").permitAll()
                         .requestMatchers("/ws/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(new JwtFilter(jwtTokenProvider, userDetailsService),
