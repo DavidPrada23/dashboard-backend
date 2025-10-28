@@ -4,7 +4,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.app.dashboard.dashboard.dto.VentaRequestDTO;
 import com.app.dashboard.dashboard.dto.VentaResponseDTO;
-import com.app.dashboard.dashboard.exception.ComercioNoEncontradoException;
 import com.app.dashboard.dashboard.model.Comercio;
 import com.app.dashboard.dashboard.model.Usuario;
 import com.app.dashboard.dashboard.model.Venta;
@@ -20,6 +19,7 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
@@ -29,11 +29,13 @@ public class VentaController {
     private final VentaService ventaService;
 
     @PostMapping
-    public ResponseEntity<Venta> registrarVenta(@RequestBody VentaRequestDTO request) {
+    public ResponseEntity<Venta> registrarVenta(@RequestBody VentaRequestDTO request, @AuthenticationPrincipal UserDetails userDetails) {
         Venta venta = ventaService.crearVenta(
             request.getProducto(),
             request.getMonto(),
-            request.getEmailUsuario()
+            request.getCliente(),
+            request.getMetodoPago(),
+            userDetails.getUsername()
         );
         return ResponseEntity.ok(venta);
     }
@@ -42,7 +44,7 @@ public class VentaController {
     public ResponseEntity<List<VentaResponseDTO>> listarMisVentas(@AuthenticationPrincipal Usuario usuario) {
         Comercio comercio = usuario.getComercio();
         if (comercio == null) {
-            throw new ComercioNoEncontradoException("El usuario no está vinculado a ningún comercio");
+            throw new RuntimeException("El usuario no está vinculado a ningún comercio");
         }
 
         List<Venta> ventas = ventaService.listarVentasPorComercio(comercio.getId());

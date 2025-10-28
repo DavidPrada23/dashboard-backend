@@ -33,6 +33,9 @@ public class Venta {
     @Column(nullable = false)
     private LocalDateTime fecha;
 
+    private String cliente;
+    private String metodoPago;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comercio_id", nullable = false)
     private Comercio comercio;

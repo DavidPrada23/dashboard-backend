@@ -25,7 +25,7 @@ public class VentaService {
     private final UsuarioRepository usuarioRepository;
     private final SimpMessagingTemplate messagingTemplate;
 
-    public Venta crearVenta(String producto, double monto, String emailUsuario) {
+    public Venta crearVenta(String producto, double monto, String emailUsuario, String cliente, String metodoPago) {
         Usuario usuario = usuarioRepository.findByEmail(emailUsuario)
                 .orElseThrow(() -> new UsuarioNoEncontradoException("Usuario con email " + emailUsuario + " no encontrado"));
 
@@ -38,6 +38,8 @@ public class VentaService {
         venta.setProducto(producto);
         venta.setMonto(BigDecimal.valueOf(monto));
         venta.setFecha(LocalDateTime.now());
+        venta.setCliente(cliente);
+        venta.setMetodoPago(metodoPago);
         venta.setComercio(comercio);
 
         Venta guardada = ventaRepository.save(venta);
