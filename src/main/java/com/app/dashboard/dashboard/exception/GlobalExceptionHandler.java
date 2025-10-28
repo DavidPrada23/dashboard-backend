@@ -44,4 +44,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleComercioNoEncontrado(ComercioNoEncontradoException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
+    @ExceptionHandler(UsuarioSinComercioException.class)
+    public ResponseEntity<String> handleUsuarioSinComercio(UsuarioSinComercioException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
 }

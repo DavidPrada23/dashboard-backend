@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.app.dashboard.dashboard.exception.ComercioNoEncontradoException;
+import com.app.dashboard.dashboard.exception.EmailYaRegistradoException;
 import com.app.dashboard.dashboard.model.Comercio;
 import com.app.dashboard.dashboard.model.Usuario;
 import com.app.dashboard.dashboard.repository.ComercioRepository;
@@ -31,7 +32,7 @@ public class ComercioService {
         // Verifica si ya existe un usuario con ese correo
         Optional<Usuario> existente = usuarioRepository.findByEmail(email);
         if (existente.isPresent()) {
-            throw new RuntimeException("El correo ya está registrado");
+            throw new EmailYaRegistradoException("El correo ya está registrado");
         }
 
         // Genera contraseña temporal

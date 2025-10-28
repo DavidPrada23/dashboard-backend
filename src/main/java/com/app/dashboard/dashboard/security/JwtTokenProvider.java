@@ -7,10 +7,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import com.app.dashboard.dashboard.config.JwtProperties;
+import com.app.dashboard.dashboard.model.Usuario;
 
 import java.security.Key;
 import java.util.Date;
-
+import java.util.Map;
 import java.nio.charset.StandardCharsets;
 
 @Component
@@ -24,14 +25,19 @@ public class JwtTokenProvider {
         return Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes());
     }
 
-    public String generateToken(String email) {
+    public String generateToken(Usuario usuario) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + EXPIRATION_TIME); // 24h
     
         Key key = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8));
-    
+
         return Jwts.builder()
-                .setSubject(email)
+                .setSubject(usuario.getEmail())
+                .addClaims(Map.of(
+                    "rol", usuario.getRol() != null ? usuario.getRol().name() : "COMERCIO",
+                    "id", usuario.getId(),
+                    "comercioId", usuario.getComercio() != null ? usuario.getComercio().getId() : null
+                ))
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(key, SignatureAlgorithm.HS512)

@@ -14,7 +14,7 @@ import com.app.dashboard.dashboard.repository.UsuarioRepository;
 import com.app.dashboard.dashboard.repository.VentaRepository;
 
 import com.app.dashboard.dashboard.exception.UsuarioNoEncontradoException;
-import com.app.dashboard.dashboard.exception.ComercioNoEncontradoException;
+import com.app.dashboard.dashboard.exception.UsuarioSinComercioException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,7 +31,7 @@ public class VentaService {
 
         Comercio comercio = usuario.getComercio();
         if (comercio == null) {
-            throw new ComercioNoEncontradoException("Este usuario no está asociado a un comercio");
+            throw new UsuarioSinComercioException("Usuario no tiene comercio asociado");
         }
         
         Venta venta = new Venta();

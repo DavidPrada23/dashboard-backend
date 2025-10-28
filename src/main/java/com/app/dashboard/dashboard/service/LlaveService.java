@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.app.dashboard.dashboard.dto.LlaveDTO;
 import com.app.dashboard.dashboard.exception.UsuarioNoEncontradoException;
+import com.app.dashboard.dashboard.exception.UsuarioSinComercioException;
 import com.app.dashboard.dashboard.model.Comercio;
 import com.app.dashboard.dashboard.model.Llave;
 import com.app.dashboard.dashboard.model.Usuario;
@@ -53,7 +54,7 @@ public class LlaveService {
 
         Comercio comercio = usuario.getComercio();
         if (comercio == null) {
-            throw new RuntimeException("El usuario no está vinculado a ningún comercio");
+            throw new UsuarioSinComercioException("Usuario no tiene comercio asociado");
         }
 
         return llaveRepository.findTopByComercioIdOrderByFechaGeneracionDesc(comercio.getId())

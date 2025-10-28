@@ -4,6 +4,7 @@ import com.app.dashboard.dashboard.dto.LoginResponseDTO;
 import com.app.dashboard.dashboard.exception.ComercioNoEncontradoException;
 import com.app.dashboard.dashboard.exception.EmailYaRegistradoException;
 import com.app.dashboard.dashboard.exception.UsuarioNoEncontradoException;
+import com.app.dashboard.dashboard.exception.UsuarioSinComercioException;
 import com.app.dashboard.dashboard.model.Comercio;
 import com.app.dashboard.dashboard.model.Usuario;
 import com.app.dashboard.dashboard.repository.ComercioRepository;
@@ -33,7 +34,7 @@ public class AuthService {
             throw new RuntimeException("Credenciales inválidas");
         }
 
-        String token = jwtTokenProvider.generateToken(email);
+        String token = jwtTokenProvider.generateToken(usuario);
         boolean comercioActivo = usuario.getComercio() != null && usuario.getComercio().isActivo();
         return new LoginResponseDTO(token, usuario.isClaveTemporal(), comercioActivo);
     }
@@ -53,6 +54,7 @@ public class AuthService {
         usuario.setDebeCambiarPassword(claveTemporal);
         usuario.setActivo(false); // Se activa después de completar registro
         usuario.setComercio(comercio);
+        usuario.setRol(null); // o asigna un rol por defecto si es necesario
 
         return usuarioRepository.save(usuario);
     }
@@ -67,7 +69,7 @@ public class AuthService {
         usuario.setClaveTemporal(false); // o setDebeCambiarPassword(false) según tu modelo
         usuarioRepository.save(usuario);
 
-        String token = jwtTokenProvider.generateToken(usuario.getEmail()); // adapta a tu método
+        String token = jwtTokenProvider.generateToken(usuario); // adapta a tu método
         boolean comercioActivo = usuario.getComercio() != null && usuario.getComercio().isActivo();
 
         return new LoginResponseDTO(token, false, comercioActivo);
@@ -79,7 +81,7 @@ public class AuthService {
                 .orElseThrow(() -> new UsuarioNoEncontradoException("Usuario no encontrado"));
 
         if (usuario.getComercio() == null) {
-            throw new RuntimeException("Usuario no tiene comercio asociado");
+            throw new UsuarioSinComercioException("Usuario no tiene comercio asociado");
         }
 
         Comercio comercio = comercioRepository.findById(usuario.getComercio().getId())
@@ -94,7 +96,7 @@ public class AuthService {
         usuario.setComercio(comercio);
         usuarioRepository.save(usuario);
 
-        String token = jwtTokenProvider.generateToken(usuario.getEmail());
+        String token = jwtTokenProvider.generateToken(usuario);
         boolean claveTemporal = usuario.isClaveTemporal(); // true/false segun tu entidad
 
         return new LoginResponseDTO(token, claveTemporal, true);
