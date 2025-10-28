@@ -34,7 +34,7 @@ public class ComercioController {
     @PutMapping("/llave")
     public ResponseEntity<String> actualizarLlave(@RequestBody LlaveDTO dto,
             @AuthenticationPrincipal(expression = "username") String correo) {
-        comercioService.actualizarLlave(correo, dto.getNuevaLlave());
+        comercioService.actualizarLlave(correo, dto.getValor());
         return ResponseEntity.ok("Llave actualizada correctamente");
     }
 

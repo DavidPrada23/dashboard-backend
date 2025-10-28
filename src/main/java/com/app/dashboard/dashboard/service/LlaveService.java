@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.app.dashboard.dashboard.dto.LlaveDTO;
 import com.app.dashboard.dashboard.exception.UsuarioNoEncontradoException;
 import com.app.dashboard.dashboard.model.Comercio;
 import com.app.dashboard.dashboard.model.Llave;
@@ -46,7 +47,7 @@ public class LlaveService {
         return llave;
     }
 
-    public Optional<Llave> obtenerUltimaLlaveDesdeEmail(String email) {
+    public Optional<LlaveDTO> obtenerUltimaLlaveDesdeEmail(String email) {
         Usuario usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new UsuarioNoEncontradoException("Usuario no encontrado"));
 
@@ -55,7 +56,12 @@ public class LlaveService {
             throw new RuntimeException("El usuario no está vinculado a ningún comercio");
         }
 
-        return llaveRepository.findTopByComercioIdOrderByFechaGeneracionDesc(comercio.getId());
+        return llaveRepository.findTopByComercioIdOrderByFechaGeneracionDesc(comercio.getId())
+                .map(llave -> {
+                    LlaveDTO dto = new LlaveDTO();
+                    dto.setValor(llave.getValor()); 
+                    return dto;
+                });
     }
 
 }
