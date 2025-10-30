@@ -6,6 +6,7 @@ import com.app.dashboard.dashboard.exception.EmailYaRegistradoException;
 import com.app.dashboard.dashboard.exception.UsuarioNoEncontradoException;
 import com.app.dashboard.dashboard.exception.UsuarioSinComercioException;
 import com.app.dashboard.dashboard.model.Comercio;
+import com.app.dashboard.dashboard.model.Rol;
 import com.app.dashboard.dashboard.model.Usuario;
 import com.app.dashboard.dashboard.repository.ComercioRepository;
 import com.app.dashboard.dashboard.repository.UsuarioRepository;
@@ -39,24 +40,39 @@ public class AuthService {
         return new LoginResponseDTO(token, usuario.isClaveTemporal(), comercioActivo);
     }
 
-    public Usuario crearUsuario(String email, String passwordPlano, boolean claveTemporal, Long comercioId) {
-        Comercio comercio = comercioRepository.findById(comercioId)
-                .orElseThrow(() -> new ComercioNoEncontradoException("Comercio no encontrado"));
+    public Usuario crearUsuario(String email, String passwordPlano, boolean claveTemporal, Long comercioId, String rol,
+            Usuario usuarioActual) {
+        if (usuarioActual.getComercio() == null) {
+            throw new UsuarioSinComercioException("Usuario no tiene comercio asociado");
+        }
 
         if (usuarioRepository.existsByEmail(email)) {
             throw new EmailYaRegistradoException("El correo ya está registrado");
         }
 
-        Usuario usuario = new Usuario();
-        usuario.setEmail(email);
-        usuario.setPassword(passwordEncoder.encode(passwordPlano));
-        usuario.setClaveTemporal(claveTemporal);
-        usuario.setDebeCambiarPassword(claveTemporal);
-        usuario.setActivo(false); // Se activa después de completar registro
-        usuario.setComercio(comercio);
-        usuario.setRol(null); // o asigna un rol por defecto si es necesario
+        Comercio comercio;
+        if (usuarioActual.getRol() == Rol.SUPERADMIN) {
+            // El superadmin puede elegir cualquier comercio
+            comercio = comercioRepository.findById(comercioId)
+                    .orElseThrow(() -> new ComercioNoEncontradoException("Comercio no encontrado"));
+        } else {
+            // El admin solo puede usar su propio comercio
+            comercio = usuarioActual.getComercio();
+            if (!comercio.getId().equals(comercioId)) {
+                throw new RuntimeException("No puedes crear usuarios en otro comercio");
+            }
+        }
 
-        return usuarioRepository.save(usuario);
+        Usuario nuevoUsuario = new Usuario();
+        nuevoUsuario.setEmail(email);
+        nuevoUsuario.setPassword(passwordEncoder.encode(passwordPlano));
+        nuevoUsuario.setClaveTemporal(claveTemporal);
+        nuevoUsuario.setDebeCambiarPassword(claveTemporal);
+        nuevoUsuario.setActivo(false); // Se activa después de completar registro
+        nuevoUsuario.setComercio(comercio);
+        nuevoUsuario.setRol(Rol.valueOf(rol)); // o asigna un rol por defecto si es necesario
+
+        return usuarioRepository.save(nuevoUsuario);
     }
 
     @Transactional

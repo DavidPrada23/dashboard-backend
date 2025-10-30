@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -73,10 +74,11 @@ public class ComercioController {
                 .body(qr);
     }
 
+    @PreAuthorize("hasRole('SUPERADMIN')")
     @PostMapping("/registrar")
-    public ResponseEntity<String> registrar(@RequestBody ComercioRegistroDTO dto) {
-        comercioService.registrarComercio(dto.getEmail(), dto.getNombre());
-        return ResponseEntity.ok("Comercio registrado y correo enviado.");
+    public ResponseEntity<String> registrar(@RequestBody ComercioRegistroDTO request) {
+        comercioService.registrarComercio(request.getEmail(), request.getNombre());
+        return ResponseEntity.ok("Comercio registrado correctamente");
     }
 
 }
